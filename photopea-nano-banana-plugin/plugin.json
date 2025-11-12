@@ -1,0 +1,9 @@
+{
+  "name": "Nano Banana Plugin",
+  "version": "1.0",
+  "description": "Photopea plugin for AI image editing using Google Nano Banana API",
+  "icon": "https://www.photopea.com/api/img/logo.svg",
+  "url": "https://obscure-garbanzo-jxrw5prgj5qf9pr-5500.app.github.dev/ui.html",
+  "w": 400,
+  "h": 500
+}
