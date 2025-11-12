@@ -1,19 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Nano Banana Photopea Plugin</title>
+  <meta charset="UTF-8">
+  <title>🍌 Nano Banana Photopea Plugin</title>
   <style>
-    body { font-family: sans-serif; padding: 12px; }
-    button { width: 100%; padding: 10px; margin-top: 8px; }
-    #log { margin-top: 12px; white-space: pre-wrap; font-size: 13px; color: #333; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #333;
+      color: white;
+      padding: 20px;
+    }
+    button, input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background: #eee;
+      cursor: pointer;
+    }
+    #log {
+      font-family: monospace;
+      font-size: 12px;
+      color: #bbb;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
   <h3>🍌 Nano Banana Photopea Plugin</h3>
-  <button id="exportBtn">Export Current Image</button>
-  <button id="aiEditBtn" disabled>Send to AI (Nano Banana)</button>
+
+  <input type="text" id="prompt" placeholder="Enter text to generate image..." />
+  <button id="generate">Generate Image from Text</button>
+  <button id="export">Export Current Image</button>
+
   <div id="log"></div>
-  <script src="./test.js"></script>
+
+  <script>
+    const API_URL = "https://your-replit-url.repl.co/api/nano-banana"; // change to your actual Replit URL
+    const log = msg => document.getElementById("log").textContent += msg + "\n";
+
+    document.getElementById("generate").onclick = async () => {
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) return alert("Enter a text prompt!");
+      log("🧠 Sending prompt to AI...");
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+        if (!data.image) throw new Error(data.error || "No image returned");
+
+        log("✅ Got image from AI, importing to Photopea...");
+
+        // Send image to Photopea as new layer
+        const binary = atob(data.image);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+
+        app.openBinary(bytes.buffer, "generated.png"); // opens image as a new layer
+        log("🎨 Image added as new layer!");
+      } catch (err) {
+        console.error(err);
+        log("❌ Error: " + err.message);
+      }
+    };
+
+    document.getElementById("export").onclick = async () => {
+      log("Exporting current image...");
+      app.activeDocument.saveToOE("png");
+    };
+  </script>
 </body>
 </html>
